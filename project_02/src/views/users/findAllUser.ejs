@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Người Dùng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        .table-responsive {
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+        }
+        .table th {
+            background: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            color: #495057;
+            padding: 1rem;
+        }
+        .table td {
+            border: none;
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .btn-action {
+            margin: 0 0.2rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .btn-edit {
+            background: #28a745;
+            color: white;
+        }
+        .btn-edit:hover {
+            background: #218838;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .add-user-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .add-user-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <div class="header-section">
+                <h1 class="mb-0">
+                    <i class="fas fa-users me-3"></i>
+                    Danh Sách Người Dùng
+                </h1>
+                <p class="mb-0 mt-2 opacity-75">Quản lý thông tin người dùng hệ thống</p>
+            </div>
+            
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="text-muted mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Tổng số: <span class="badge bg-primary"><%= datalist.length %></span> người dùng
+                        </h5>
+                    </div>
+                    <div>
+                        <a href="/crud" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Thêm người dùng
+                        </a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user me-2"></i>Người dùng</th>
+                                <th><i class="fas fa-envelope me-2"></i>Email</th>
+                                <th><i class="fas fa-id-card me-2"></i>Tên</th>
+                                <th><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ</th>
+                                <th><i class="fas fa-cogs me-2"></i>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for(let i=0; i < datalist.length; i++) { %>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar">
+                                            <%= datalist[i].firstName.charAt(0).toUpperCase() %>
+                                        </div>
+                                        <div>
+                                            <strong><%= datalist[i].firstName %> <%= datalist[i].lastName %></strong>
+                                            <br>
+                                            <small class="text-muted">ID: #<%= datalist[i].id %></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-primary">
+                                        <i class="fas fa-envelope me-1"></i>
+                                        <%= datalist[i].email %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong><%= datalist[i].firstName %></strong><br>
+                                    <span class="text-muted"><%= datalist[i].lastName %></span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                    <%= datalist[i].address || 'Chưa cập nhật' %>
+                                </td>
+                                <td>
+                                    <a href="/edit-crud?id=<%= datalist[i].id %>" class="btn-action btn-edit">
+                                        <i class="fas fa-edit me-1"></i>Sửa
+                                    </a>
+                                    <a href="/delete-crud?id=<%= datalist[i].id %>" 
+                                       class="btn-action btn-delete delete-user"
+                                       data-id="<%= datalist[i].id %>"
+                                       data-name="<%= datalist[i].firstName %> <%= datalist[i].lastName %>">
+                                        <i class="fas fa-trash me-1"></i>Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <% if(datalist.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fas fa-users text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted mt-3">Chưa có người dùng nào</h4>
+                    <p class="text-muted">Hãy thêm người dùng đầu tiên vào hệ thống</p>
+                    <a href="/crud" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm người dùng
+                    </a>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Add Button -->
+    <button class="add-user-btn" onclick="window.location.href='/crud'" title="Thêm người dùng mới">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle delete confirmation và redirect
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const userId = this.getAttribute('data-id');
+                const userName = this.getAttribute('data-name');
+                
+                if (confirm(`Bạn có chắc chắn muốn xóa người dùng "${userName}"?`)) {
+                    // Show loading state
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang xóa...';
+                    this.style.pointerEvents = 'none';
+                    
+                    // Redirect to delete endpoint
+                    setTimeout(() => {
+                        window.location.href = `/delete-crud?id=${userId}`;
+                    }, 500);
+                }
+            });
+        });
+        
+        // Check for success messages from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Success messages
+        if (urlParams.get('deleted') === 'success') {
+            showNotification('Xóa người dùng thành công!', 'success');
+        }
+        if (urlParams.get('created') === 'success') {
+            showNotification('Tạo người dùng thành công!', 'success');
+        }
+        if (urlParams.get('updated') === 'success') {
+            showNotification('Cập nhật thông tin thành công!', 'success');
+        }
+        
+        // Error messages
+        if (urlParams.get('deleted') === 'error') {
+            showNotification('Có lỗi xảy ra khi xóa người dùng!', 'error');
+        }
+        if (urlParams.get('created') === 'error') {
+            showNotification('Có lỗi xảy ra khi tạo người dùng!', 'error');
+        }
+        if (urlParams.get('updated') === 'error') {
+            showNotification('Có lỗi xảy ra khi cập nhật thông tin!', 'error');
+        }
+        
+        // Remove the parameter from URL after showing message
+        if (urlParams.has('deleted') || urlParams.has('created') || urlParams.has('updated')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
+        // Notification function
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.minWidth = '300px';
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Auto refresh every 30 seconds to show latest data
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
