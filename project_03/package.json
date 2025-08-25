@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.3",
+    "sequelize": "^6.37.7"
+  },
+  "name": "project_03",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "description": "TypeScript Express application with Sequelize ORM and EJS templating",
+  "devDependencies": {
+    "@babel/core": "^7.28.3",
+    "@babel/node": "^7.28.0",
+    "@babel/preset-env": "^7.28.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.0",
+    "@types/npm": "^7.19.3",
+    "bcryptjs": "^3.0.2",
+    "install": "^0.13.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sequelize": "sequelize",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "start": "ts-node src/server.ts",
+    "build": "tsc",
+    "prod": "node dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
