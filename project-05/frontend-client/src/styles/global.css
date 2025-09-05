@@ -1,0 +1,255 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Home Page Styles */
+.home-page {
+  min-height: calc(100vh - 64px);
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 120px 0;
+  text-align: center;
+  color: white;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.hero-icon {
+  font-size: 80px;
+  margin-bottom: 32px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-title {
+  color: white !important;
+  font-size: 48px !important;
+  font-weight: 700 !important;
+  margin-bottom: 16px !important;
+}
+
+.hero-subtitle {
+  font-size: 20px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin-bottom: 40px !important;
+}
+
+.hero-actions {
+  justify-content: center;
+}
+
+.features-section {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 60px !important;
+  color: #333 !important;
+}
+
+.feature-card {
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-content {
+  text-align: center;
+  padding: 24px;
+}
+
+.feature-icon {
+  font-size: 48px;
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.feature-title {
+  color: #333 !important;
+  margin-bottom: 16px !important;
+}
+
+.feature-description {
+  color: #666 !important;
+  font-size: 16px !important;
+}
+
+.status-section {
+  padding: 60px 0;
+  background: white;
+}
+
+.status-card {
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Auth Pages Styles */
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-container {
+  width: 100%;
+}
+
+.auth-card {
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  border: none;
+  overflow: hidden;
+}
+
+.auth-header {
+  text-align: center;
+  padding: 40px 40px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.auth-icon {
+  font-size: 64px;
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.auth-title {
+  color: #333 !important;
+  margin-bottom: 8px !important;
+  font-weight: 600 !important;
+}
+
+.auth-subtitle {
+  color: #666 !important;
+  font-size: 16px !important;
+}
+
+.auth-form {
+  padding: 20px 40px;
+}
+
+.auth-footer {
+  padding: 20px 40px 40px;
+  background: #fafafa;
+}
+
+.back-link {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #667eea;
+}
+
+.auth-switch {
+  text-align: center;
+}
+
+.auth-link {
+  color: #667eea;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  color: #5a67d8;
+}
+
+/* User Page Styles */
+.user-page {
+  padding: 40px 0;
+  min-height: calc(100vh - 64px);
+}
+
+.user-table-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.page-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modern-table .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.modern-table .ant-table-tbody > tr:hover > td {
+  background: #f8f9ff;
+}
+
+.modern-table .ant-table-tbody > tr > td {
+  padding: 16px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 36px !important;
+  }
+
+  .hero-subtitle {
+    font-size: 18px !important;
+  }
+
+  .hero-icon {
+    font-size: 60px;
+  }
+
+  .auth-header,
+  .auth-form,
+  .auth-footer {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .header-content {
+    padding: 0 16px;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content {
+    padding: 0 16px;
+  }
+
+  .hero-actions .ant-btn {
+    margin-bottom: 8px;
+  }
+
+  .features-section {
+    padding: 60px 0;
+  }
+}
