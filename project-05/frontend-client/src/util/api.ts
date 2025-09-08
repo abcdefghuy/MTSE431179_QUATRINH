@@ -4,6 +4,7 @@ import type {
   Category,
   Product,
   ProductsByCategoryParams,
+  SearchProductsParams,
 } from "../types/product.types";
 
 const BASE_URL = "/v1/api";
@@ -47,10 +48,19 @@ const getProductsByCategoryAPI = (
   });
 };
 
+const searchProductsAPI = (
+  params: SearchProductsParams
+): Promise<ApiResponse<Product[]>> => {
+  return axios.get(`${BASE_URL}/products/search`, {
+    params,
+  });
+};
+
 export {
   createUserAPI,
   loginUserAPI,
   getUserAPI,
   getCategoriesAPI,
   getProductsByCategoryAPI,
+  searchProductsAPI,
 };

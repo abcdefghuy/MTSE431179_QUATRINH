@@ -11,8 +11,10 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../components/context/auth.context";
+import { useSearchContext } from "../components/context/search.context";
 import { useProducts } from "../hooks/useProducts";
 import CategorySelector from "../components/products/CategorySelector";
+import SearchBarWithFilters from "../components/products/SearchBarWithFilters";
 import ProductGrid from "../components/products/ProductGrid";
 import type { Product } from "../types/product.types";
 
@@ -21,6 +23,18 @@ const { Title, Paragraph, Text } = Typography;
 
 const ProductsPage: React.FC = () => {
   const { authState } = useContext(AuthContext);
+
+  // Search context for header integration
+  const searchContext = useSearchContext();
+  const hasSearchFilters =
+    searchContext.filters.query ||
+    searchContext.filters.categoryId ||
+    searchContext.filters.rating > 0 ||
+    searchContext.filters.inStock ||
+    searchContext.filters.priceRange[0] > 0 ||
+    searchContext.filters.priceRange[1] < 10000000;
+
+  // Original products hook for category browsing
   const {
     categories,
     products,
@@ -236,39 +250,85 @@ const ProductsPage: React.FC = () => {
               </div>
             )}
 
-            {/* Category Selector */}
-            <div className="animate-slide-in-left">
-              <CategorySelector
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onSelectCategory={selectCategory}
-                loading={loading.categories}
-                onRetry={retryLoadCategories}
-              />
-            </div>
+            {/* Show search results if there are search filters, otherwise show category browsing */}
+            {hasSearchFilters ? (
+              <>
+                {/* Search Results Section */}
+                <div className="animate-slide-in-left">
+                  <SearchBarWithFilters
+                    categories={searchContext.categories}
+                    filters={searchContext.filters}
+                    onFiltersChange={searchContext.updateFilters}
+                    onSearch={searchContext.searchProducts}
+                    loading={searchContext.loading.search}
+                    placeholder="Tìm kiếm sản phẩm..."
+                    className="max-w-2xl mx-auto"
+                  />
+                </div>
 
-            {/* Product Grid */}
-            <div className="animate-slide-in-right">
-              <ProductGrid
-                products={products}
-                loading={loading.products}
-                loadingMore={loading.loadingMore}
-                error={error.products}
-                hasMore={pagination.hasMore}
-                totalItems={pagination.totalItems}
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                itemsPerPage={pagination.itemsPerPage}
-                isInfiniteScroll={isInfiniteScroll}
-                onViewDetails={handleViewDetails}
-                onAddToCart={handleAddToCart}
-                onLoadMore={loadMoreProducts}
-                onRetry={retryLoadProducts}
-                onChangePage={changePage}
-                onChangePageSize={changePageSize}
-                onTogglePaginationMode={togglePaginationMode}
-              />
-            </div>
+                {/* Search Results Grid */}
+                <div className="animate-slide-in-right">
+                  <ProductGrid
+                    products={searchContext.products}
+                    loading={
+                      searchContext.loading.search ||
+                      searchContext.loading.products
+                    }
+                    loadingMore={false}
+                    error={searchContext.error.search}
+                    hasMore={searchContext.pagination.hasMore}
+                    totalItems={searchContext.pagination.totalItems}
+                    currentPage={searchContext.pagination.currentPage}
+                    totalPages={searchContext.pagination.totalPages}
+                    itemsPerPage={searchContext.pagination.itemsPerPage}
+                    isInfiniteScroll={false}
+                    onViewDetails={handleViewDetails}
+                    onAddToCart={handleAddToCart}
+                    onLoadMore={searchContext.loadMoreProducts}
+                    onRetry={searchContext.retrySearch}
+                    onChangePage={searchContext.changePage}
+                    onChangePageSize={searchContext.changePageSize}
+                    onTogglePaginationMode={() => {}}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Category Selector */}
+                <div className="animate-slide-in-left">
+                  <CategorySelector
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={selectCategory}
+                    loading={loading.categories}
+                    onRetry={retryLoadCategories}
+                  />
+                </div>
+
+                {/* Product Grid */}
+                <div className="animate-slide-in-right">
+                  <ProductGrid
+                    products={products}
+                    loading={loading.products}
+                    loadingMore={loading.loadingMore}
+                    error={error.products}
+                    hasMore={pagination.hasMore}
+                    totalItems={pagination.totalItems}
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    itemsPerPage={pagination.itemsPerPage}
+                    isInfiniteScroll={isInfiniteScroll}
+                    onViewDetails={handleViewDetails}
+                    onAddToCart={handleAddToCart}
+                    onLoadMore={loadMoreProducts}
+                    onRetry={retryLoadProducts}
+                    onChangePage={changePage}
+                    onChangePageSize={changePageSize}
+                    onTogglePaginationMode={togglePaginationMode}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

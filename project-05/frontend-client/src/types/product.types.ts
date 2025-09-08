@@ -44,3 +44,28 @@ export interface ProductsByCategoryParams {
   limit?: number;
   offset?: number;
 }
+
+export interface SearchProductsParams {
+  query?: string;
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  rating?: number;
+  minReviewCount?: number;
+  inStock?: boolean;
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SearchFilters {
+  query: string;
+  categoryId: string;
+  priceRange: [number, number];
+  rating: number;
+  minReviewCount: number;
+  inStock: boolean;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+}

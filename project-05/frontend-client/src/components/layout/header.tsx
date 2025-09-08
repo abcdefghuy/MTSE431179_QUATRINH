@@ -8,7 +8,6 @@ import {
   ShoppingOutlined,
   CrownOutlined,
   BellOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
 import {
   Menu,
@@ -16,21 +15,23 @@ import {
   Avatar,
   Dropdown,
   Typography,
-  Input,
   Badge,
   Button,
 } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
+import { useSearchContext } from "../context/search.context";
+import SearchBarWithFilters from "../products/SearchBarWithFilters";
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
-const { Search } = Input;
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const { authState, setAuthState } = useContext(AuthContext);
+  const { categories, filters, updateFilters, searchProducts } =
+    useSearchContext();
 
   const [current, setCurrent] = useState<string>("home");
 
@@ -49,6 +50,13 @@ const Header: React.FC = () => {
       },
     });
     navigate("/");
+  };
+
+  const handleHeaderSearch = () => {
+    // Navigate to products page and perform search
+    navigate("/products");
+    setCurrent("products");
+    searchProducts();
   };
 
   const userMenuItems: MenuProps["items"] = [
@@ -117,14 +125,15 @@ const Header: React.FC = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex-1 max-w-md mx-8">
-          <Search
+        <div className="flex-1 max-w-md mx-6">
+          <SearchBarWithFilters
+            categories={categories}
+            filters={filters}
+            onFiltersChange={updateFilters}
+            onSearch={handleHeaderSearch}
+            loading={false}
             placeholder="Tìm kiếm sản phẩm..."
-            allowClear
-            enterButton={<SearchOutlined />}
-            size="middle"
-            className="search-input"
-            onSearch={(value) => console.log(value)}
+            className="header-search"
           />
         </div>
 
@@ -202,29 +211,14 @@ const Header: React.FC = () => {
       </div>
 
       <style>{`
-        .search-input .ant-input {
-          border-radius: 12px;
-          border: 2px solid #e5e7eb;
-          transition: all 0.3s ease;
+        .header-search {
+          max-width: 100%;
+          height: 40px;
         }
-
-        .search-input .ant-input:focus,
-        .search-input .ant-input:hover {
-          border-color: #f59e0b;
-          box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-
-        .search-input .ant-input-search-button {
-          border-radius: 0 12px 12px 0;
-          border: 2px solid #f59e0b;
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          transition: all 0.3s ease;
-        }
-
-        .search-input .ant-input-search-button:hover {
-          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        
+        .header-search .search-bar-container {
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          height: 40px;
         }
 
         .ant-menu-horizontal {

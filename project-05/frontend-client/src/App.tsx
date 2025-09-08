@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./components/layout/header";
 import axios from "./util/axios.customize";
 import { AuthContext } from "./components/context/auth.context";
+import { SearchProvider } from "./components/context/search.context";
 import { Spin } from "antd";
 
 interface UserResponse {
@@ -44,12 +45,12 @@ const App: React.FC = () => {
           </div>
         </div>
       ) : (
-        <>
+        <SearchProvider>
           <Header />
           <main className="main-content">
             <Outlet />
           </main>
-        </>
+        </SearchProvider>
       )}
     </div>
   );
