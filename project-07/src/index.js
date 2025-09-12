@@ -23,7 +23,6 @@ import { CartProviderWithAdapter } from "./providers/CartProviderWithAdapter.jsx
 // Standard Hooks
 import useCartOperations from "./hooks/useCartOperations.js";
 import useCartValidation from "./hooks/useCartValidation.js";
-import useCartStorage from "./hooks/useCartStorage.js";
 
 // Data Adapter Hooks
 import {
@@ -66,7 +65,6 @@ export {
   // Standard Hooks
   useCartOperations,
   useCartValidation,
-  useCartStorage,
 
   // Adapter Hooks
   useCartAdapter,
@@ -108,7 +106,6 @@ const ReactCartLibrary = {
   // Standard Hooks
   useCartOperations,
   useCartValidation,
-  useCartStorage,
 
   // Adapter Hooks
   useCartAdapter,
