@@ -1,0 +1,92 @@
+{
+  "name": "@yourorg/react-cart-library",
+  "version": "1.0.0",
+  "description": "A comprehensive React library for shopping cart functionality with standardized UI components",
+  "author": "Software Architecture Team <dev@yourorg.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/yourorg/react-cart-library#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourorg/react-cart-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourorg/react-cart-library/issues"
+  },
+  "keywords": [
+    "react",
+    "cart",
+    "shopping-cart",
+    "ui-components",
+    "library",
+    "e-commerce",
+    "typescript",
+    "hooks",
+    "context"
+  ],
+  "type": "module",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "typescript": "^5.0.0",
+    "vite": "^7.1.2",
+    "vite-plugin-dts": "^4.3.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:lib": "tsc && vite build --mode lib",
+    "build:types": "tsc --emitDeclarationOnly",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build:lib",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
