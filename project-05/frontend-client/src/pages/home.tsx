@@ -6,16 +6,35 @@ import {
   ShoppingCartOutlined,
   ArrowRightOutlined,
   CheckCircleOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Row, Typography, Button } from "antd";
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Card, Col, Row, Typography, Button, message } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/context/auth.context";
+import {
+  getUserViewHistoryAPI,
+  getRecommendationsAPI,
+  getDiscoverRecommendationsAPI,
+  getTrendingProductsAPI,
+  getPersonalizedRecommendationsAPI,
+} from "../util/api.ts";
+import { handleApiError } from "../util/errorHandler";
+import type { ViewHistory, Product } from "../types/product.types";
 
 const { Title, Paragraph } = Typography;
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const { authState } = useContext(AuthContext);
+  const [recentlyViewed, setRecentlyViewed] = useState<ViewHistory[]>([]);
+  const [recommendations, setRecommendations] = useState<Product[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [discoverProducts, setDiscoverProducts] = useState<Product[]>([]);
+  const [loadingDiscover, setLoadingDiscover] = useState(false);
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [loadingTrending, setLoadingTrending] = useState(false);
 
   const features = [
     {
@@ -40,6 +59,96 @@ const HomePage: React.FC = () => {
       bgColor: "from-orange-50 to-red-50",
     },
   ];
+
+  useEffect(() => {
+    // Fetch public content always
+    fetchDiscoverProducts();
+    fetchTrendingProducts();
+
+    // Fetch personalized content only if authenticated
+    if (authState.isAuthenticated) {
+      fetchViewHistory();
+      fetchRecommendations();
+    }
+  }, [authState.isAuthenticated]);
+
+  const fetchViewHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      const response = await getUserViewHistoryAPI();
+      // Lấy 8 sản phẩm gần đây nhất
+      setRecentlyViewed(response.data.slice(0, 8));
+    } catch (error: any) {
+      const errorType = handleApiError(error, {
+        showAuthError: false, // Don't show auth error on home page
+        defaultErrorMessage: authState.isAuthenticated
+          ? "Không thể tải lịch sử xem sản phẩm"
+          : "",
+      });
+      if (errorType === "AUTH_ERROR") {
+        console.log("User not authenticated for view history");
+        setRecentlyViewed([]);
+      }
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const fetchRecommendations = async () => {
+    try {
+      setLoadingRecommendations(true);
+      const response = await getPersonalizedRecommendationsAPI();
+      // Lấy 8 sản phẩm được đề xuất
+      setRecommendations(response.data.slice(0, 8));
+    } catch (error) {
+      const errorType = handleApiError(error, {
+        showAuthError: false, // Don't show auth error on home page
+        defaultErrorMessage: authState.isAuthenticated
+          ? "Không thể tải gợi ý sản phẩm"
+          : "",
+      });
+      if (errorType === "AUTH_ERROR") {
+        console.log("User not authenticated for recommendations");
+        setRecommendations([]);
+      }
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
+  const fetchDiscoverProducts = async () => {
+    setLoadingDiscover(true);
+    try {
+      const response = await getDiscoverRecommendationsAPI();
+      setDiscoverProducts(response.data.slice(0, 8) || []);
+    } catch (error) {
+      handleApiError(error, {
+        defaultErrorMessage: "Không thể tải sản phẩm khám phá",
+        showNotification: true,
+      });
+    } finally {
+      setLoadingDiscover(false);
+    }
+  };
+
+  const fetchTrendingProducts = async () => {
+    setLoadingTrending(true);
+    try {
+      const response = await getTrendingProductsAPI();
+      setTrendingProducts(response.data.slice(0, 8) || []);
+    } catch (error) {
+      handleApiError(error, {
+        defaultErrorMessage: "Không thể tải sản phẩm xu hướng",
+        showNotification: true,
+      });
+    } finally {
+      setLoadingTrending(false);
+    }
+  };
+
+  const handleViewProduct = (productId: string) => {
+    navigate(`/products/${productId}`);
+  };
 
   return (
     <div className="home-page min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
@@ -275,6 +384,382 @@ const HomePage: React.FC = () => {
         </section>
       )}
 
+      {/* Discover Products Section */}
+      <section className="max-w-7xl mx-auto px-6 py-16">
+        <div className="text-center mb-12">
+          <Title
+            level={2}
+            className="!text-4xl !font-black !text-gray-800 !mb-4"
+          >
+            🚀 Khám phá sản phẩm
+          </Title>
+          <Paragraph className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Những sản phẩm mới và thú vị dành cho mọi người
+          </Paragraph>
+        </div>
+
+        {loadingDiscover ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : discoverProducts.length > 0 ? (
+          <Row gutter={[24, 24]}>
+            {discoverProducts.map((product) => (
+              <Col xs={24} sm={12} lg={8} xl={6} key={product._id}>
+                <Card
+                  hoverable
+                  className="h-full shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl border-0 overflow-hidden hover:scale-105 group"
+                  cover={
+                    <div className="aspect-square bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4 relative">
+                      <ShoppingCartOutlined className="text-4xl text-blue-300 group-hover:text-blue-500 transition-colors duration-300" />
+                    </div>
+                  }
+                  onClick={() => handleViewProduct(product._id!)}
+                >
+                  <Card.Meta
+                    title={
+                      <div className="text-lg font-semibold text-gray-800 line-clamp-2">
+                        {product.name}
+                      </div>
+                    }
+                    description={
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                            {product.category?.name || "Chưa phân loại"}
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              (product.stock || 0) > 0
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {(product.stock || 0) > 0 ? "Còn hàng" : "Hết hàng"}
+                          </span>
+                        </div>
+                        <div className="text-xl font-bold text-blue-600">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(product.price || 0)}
+                        </div>
+                      </div>
+                    }
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        ) : (
+          <div className="text-center py-12">
+            <Paragraph className="text-gray-500">
+              Không có sản phẩm khám phá nào
+            </Paragraph>
+          </div>
+        )}
+      </section>
+
+      {/* Trending Products Section */}
+      <section className="max-w-7xl mx-auto px-6 py-16 bg-gradient-to-br from-orange-50 to-red-50">
+        <div className="text-center mb-12">
+          <Title
+            level={2}
+            className="!text-4xl !font-black !text-gray-800 !mb-4"
+          >
+            🔥 Xu hướng thịnh hành
+          </Title>
+          <Paragraph className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Những sản phẩm được yêu thích nhất hiện tại
+          </Paragraph>
+        </div>
+
+        {loadingTrending ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+          </div>
+        ) : trendingProducts.length > 0 ? (
+          <Row gutter={[24, 24]}>
+            {trendingProducts.map((product, index) => (
+              <Col xs={24} sm={12} lg={8} xl={6} key={product._id}>
+                <Card
+                  hoverable
+                  className="h-full shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl border-0 overflow-hidden hover:scale-105 group relative"
+                  cover={
+                    <div className="aspect-square bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4 relative">
+                      <FireOutlined className="text-4xl text-orange-300 group-hover:text-orange-500 transition-colors duration-300" />
+                      {index < 3 && (
+                        <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                          #{index + 1}
+                        </div>
+                      )}
+                    </div>
+                  }
+                  onClick={() => handleViewProduct(product._id!)}
+                >
+                  <Card.Meta
+                    title={
+                      <div className="text-lg font-semibold text-gray-800 line-clamp-2">
+                        {product.name}
+                      </div>
+                    }
+                    description={
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">
+                            {product.category?.name || "Chưa phân loại"}
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              (product.stock || 0) > 0
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {(product.stock || 0) > 0 ? "Còn hàng" : "Hết hàng"}
+                          </span>
+                        </div>
+                        <div className="text-xl font-bold text-orange-600">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(product.price || 0)}
+                        </div>
+                      </div>
+                    }
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        ) : (
+          <div className="text-center py-12">
+            <Paragraph className="text-gray-500">
+              Không có sản phẩm xu hướng nào
+            </Paragraph>
+          </div>
+        )}
+      </section>
+
+      {/* Recently Viewed Products Section */}
+      {authState.isAuthenticated && recentlyViewed.length > 0 && (
+        <section className="py-24 bg-gradient-to-br from-white via-blue-50 to-indigo-50 relative overflow-hidden">
+          <div className="relative max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <div className="inline-block mb-6">
+                <span className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-sm font-semibold">
+                  👀 Gần đây
+                </span>
+              </div>
+              <Title
+                level={2}
+                className="!text-4xl !font-black !text-gray-800 !mb-6"
+              >
+                Sản phẩm bạn đã xem
+                <span className="block bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  gần đây
+                </span>
+              </Title>
+              <Paragraph className="!text-xl !text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Tiếp tục khám phá những sản phẩm thú vị mà bạn đã quan tâm
+              </Paragraph>
+            </div>
+
+            <Row gutter={[24, 24]}>
+              {recentlyViewed
+                .filter((viewHistory) => viewHistory.productId) // Filter out items with missing productId
+                .map((viewHistory, index) => (
+                  <Col xs={24} sm={12} md={8} lg={6} key={viewHistory._id}>
+                    <Card
+                      hoverable
+                      className="h-full shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl border-0 overflow-hidden hover:scale-105 group"
+                      cover={
+                        <div className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4 relative">
+                          <ShoppingCartOutlined className="text-4xl text-purple-300 group-hover:text-purple-500 transition-colors duration-300" />
+                          <div className="absolute top-2 right-2">
+                            <EyeOutlined className="text-gray-400" />
+                          </div>
+                        </div>
+                      }
+                      onClick={() =>
+                        handleViewProduct(viewHistory.productId?._id)
+                      }
+                    >
+                      <Card.Meta
+                        title={
+                          <div className="space-y-2">
+                            <div className="text-lg font-semibold text-gray-800 line-clamp-2">
+                              {viewHistory.productId?.name ||
+                                "Sản phẩm không xác định"}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              Xem{" "}
+                              {new Date(
+                                viewHistory.viewedAt || viewHistory.createdAt
+                              ).toLocaleDateString("vi-VN")}
+                            </div>
+                          </div>
+                        }
+                        description={
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                                {viewHistory.productId?.category?.name ||
+                                  "Chưa phân loại"}
+                              </span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                  (viewHistory.productId?.stock || 0) > 0
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                }`}
+                              >
+                                {(viewHistory.productId?.stock || 0) > 0
+                                  ? "Còn hàng"
+                                  : "Hết hàng"}
+                              </span>
+                            </div>
+                            <div className="text-xl font-bold text-purple-600">
+                              {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(viewHistory.productId?.price || 0)}
+                            </div>
+                          </div>
+                        }
+                      />
+                    </Card>
+                  </Col>
+                ))}
+            </Row>
+
+            {recentlyViewed.length === 8 && (
+              <div className="text-center mt-12">
+                <Link to="/products">
+                  <Button
+                    type="primary"
+                    size="large"
+                    icon={<ShoppingCartOutlined />}
+                    className="h-14 px-8 bg-gradient-to-r from-purple-500 to-pink-500 border-0 hover:from-purple-600 hover:to-pink-600 shadow-xl hover:shadow-2xl transition-all duration-500 font-bold text-lg rounded-2xl hover:scale-105 hover:-translate-y-1"
+                  >
+                    Xem tất cả sản phẩm
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Recommendations Section */}
+      {authState.isAuthenticated && (
+        <section className="max-w-7xl mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <Title
+              level={2}
+              className="!text-4xl !font-black !text-gray-800 !mb-4"
+            >
+              🎯 Gợi ý dành cho bạn
+            </Title>
+            <Paragraph className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Những sản phẩm được chọn lọc phù hợp với sở thích của bạn
+            </Paragraph>
+          </div>
+
+          {loadingRecommendations ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            </div>
+          ) : recommendations.length > 0 ? (
+            <Row gutter={[24, 24]}>
+              {recommendations.map((product) => (
+                <Col xs={24} sm={12} lg={8} xl={6} key={product._id}>
+                  <Card
+                    hoverable
+                    className="h-full shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl border-0 overflow-hidden transform hover:scale-105 group"
+                    cover={
+                      <div className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4 relative">
+                        <ShoppingCartOutlined className="text-4xl text-purple-300 group-hover:text-purple-500 transition-colors duration-300" />
+                        <div className="absolute top-2 right-2">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              (product.stock || 0) > 0
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {(product.stock || 0) > 0 ? "Còn hàng" : "Hết hàng"}
+                          </span>
+                        </div>
+                      </div>
+                    }
+                    onClick={() => handleViewProduct(product._id)}
+                  >
+                    <Card.Meta
+                      title={
+                        <div className="space-y-2">
+                          <div className="text-lg font-semibold text-gray-800 line-clamp-2">
+                            {product.name}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={`text-sm ${
+                                    i < (product.rating || 0)
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                            <span className="text-sm text-gray-500">
+                              ({product.reviewCount || 0})
+                            </span>
+                          </div>
+                        </div>
+                      }
+                      description={
+                        <div className="space-y-3">
+                          <div className="text-xl font-bold text-indigo-600">
+                            {new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(product.price || 0)}
+                          </div>
+                        </div>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">🤖</div>
+              <Title level={4} className="!text-gray-500 !mb-2">
+                Chưa có gợi ý sản phẩm
+              </Title>
+              <Paragraph className="text-gray-400 mb-6">
+                Hãy xem thêm các sản phẩm để nhận được gợi ý phù hợp
+              </Paragraph>
+              <Link to="/products">
+                <Button
+                  type="primary"
+                  size="large"
+                  className="bg-gradient-to-r from-indigo-500 to-purple-500 border-0 hover:from-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                >
+                  Khám phá sản phẩm
+                </Button>
+              </Link>
+            </div>
+          )}
+        </section>
+      )}
+
       <style>{`
         .hero-actions .ant-btn {
           border-radius: 16px;
@@ -284,6 +769,13 @@ const HomePage: React.FC = () => {
           font-size: 48px;
           color: #667eea;
           margin-bottom: 20px;
+        }
+
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </div>

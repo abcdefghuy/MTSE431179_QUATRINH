@@ -4,6 +4,7 @@ import "./index.css";
 import "./App.css";
 import "./styles/global.css";
 import { AuthWrapper } from "./components/context/auth.context.tsx";
+import { FavoritesProvider } from "./components/context/favorites.context.tsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import HomePage from "./pages/home.tsx";
@@ -11,6 +12,8 @@ import LoginPage from "./pages/login.tsx";
 import RegisterPage from "./pages/register.tsx";
 import UserPage from "./pages/user.tsx";
 import ProductsPage from "./pages/products.tsx";
+import ProductDetailPage from "./pages/product-detail.tsx";
+import AccountPage from "./pages/account.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +31,14 @@ const router = createBrowserRouter([
       {
         path: "products",
         element: <ProductsPage />,
+      },
+      {
+        path: "products/:productId",
+        element: <ProductDetailPage />,
+      },
+      {
+        path: "account",
+        element: <AccountPage />,
       },
     ],
   },
@@ -47,7 +58,9 @@ if (!rootElement) throw new Error("Root element not found");
 createRoot(rootElement).render(
   <StrictMode>
     <AuthWrapper>
-      <RouterProvider router={router} />
+      <FavoritesProvider>
+        <RouterProvider router={router} />
+      </FavoritesProvider>
     </AuthWrapper>
   </StrictMode>
 );

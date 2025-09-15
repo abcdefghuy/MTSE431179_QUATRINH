@@ -8,6 +8,7 @@ import {
   ShoppingOutlined,
   CrownOutlined,
   BellOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 import {
   Menu,
@@ -22,6 +23,7 @@ import type { MenuProps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import { useSearchContext } from "../context/search.context";
+import { useFavoritesContext } from "../context/favorites.context";
 import SearchBarWithFilters from "../products/SearchBarWithFilters";
 
 const { Header: AntHeader } = Layout;
@@ -32,6 +34,7 @@ const Header: React.FC = () => {
   const { authState, setAuthState } = useContext(AuthContext);
   const { categories, filters, updateFilters, searchProducts } =
     useSearchContext();
+  const { favoritesCount } = useFavoritesContext();
 
   const [current, setCurrent] = useState<string>("home");
 
@@ -60,6 +63,11 @@ const Header: React.FC = () => {
   };
 
   const userMenuItems: MenuProps["items"] = [
+    {
+      key: "account",
+      icon: <UserOutlined />,
+      label: <Link to="/account">Tài khoản của tôi</Link>,
+    },
     {
       key: "profile",
       icon: <UserOutlined />,
@@ -151,6 +159,27 @@ const Header: React.FC = () => {
 
         {/* User Section */}
         <div className="flex items-center space-x-4">
+          {/* Favorites - Only show for authenticated users */}
+          {authState.isAuthenticated && (
+            <Badge
+              count={favoritesCount}
+              size="small"
+              className="cursor-pointer"
+            >
+              <Button
+                type="text"
+                shape="circle"
+                icon={<HeartOutlined />}
+                onClick={() => {
+                  navigate("/account?tab=favorites");
+                  setCurrent("account");
+                }}
+                className="w-10 h-10 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all duration-300"
+                title="Sản phẩm yêu thích"
+              />
+            </Badge>
+          )}
+
           {/* Notifications */}
           {authState.isAuthenticated && (
             <Badge count={3} size="small" className="cursor-pointer">

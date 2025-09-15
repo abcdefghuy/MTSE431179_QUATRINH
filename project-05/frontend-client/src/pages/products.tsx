@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Layout, Typography, Modal, message, Alert, Button, Rate } from "antd";
+import { Layout, Typography, message, Alert, Button } from "antd";
 import {
   ShoppingCartOutlined,
   LoginOutlined,
@@ -7,9 +7,8 @@ import {
   StarOutlined,
   FireOutlined,
   GiftOutlined,
-  CrownOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/context/auth.context";
 import { useSearchContext } from "../components/context/search.context";
 import { useProducts } from "../hooks/useProducts";
@@ -22,6 +21,7 @@ const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 const ProductsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { authState } = useContext(AuthContext);
 
   // Search context for header integration
@@ -53,64 +53,8 @@ const ProductsPage: React.FC = () => {
   } = useProducts();
 
   const handleViewDetails = (product: Product) => {
-    Modal.info({
-      title: (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-            <CrownOutlined className="text-white" />
-          </div>
-          <span className="text-xl font-bold">{product.name}</span>
-        </div>
-      ),
-      width: 700,
-      content: (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl flex items-center justify-center">
-                <ShoppingCartOutlined className="text-6xl text-purple-300" />
-              </div>
-              <div className="flex gap-2">
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                  Còn hàng: {product.stock}
-                </span>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                  {product.category?.name}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <Text className="text-gray-600 text-sm">Mô tả sản phẩm</Text>
-                <Paragraph className="text-gray-800 leading-relaxed">
-                  {product.description}
-                </Paragraph>
-              </div>
-              <div className="flex items-center gap-2">
-                <Rate
-                  disabled
-                  value={product.rating || 4.5}
-                  className="text-yellow-400"
-                />
-                <Text className="text-gray-500">
-                  ({product.reviewCount || 445} đánh giá)
-                </Text>
-              </div>
-              <div className="pt-4">
-                <Text className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(product.price)}
-                </Text>
-              </div>
-            </div>
-          </div>
-        </div>
-      ),
-      okText: "Đóng",
-      className: "modern-modal",
-    });
+    // Navigate to product detail page instead of showing modal
+    navigate(`/products/${product._id}`);
   };
 
   const handleAddToCart = (product: Product) => {

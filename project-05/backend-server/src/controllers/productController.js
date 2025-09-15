@@ -79,8 +79,43 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+/**
+ * Get product details by ID
+ * GET /v1/api/products/:productId
+ */
+const getProductById = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    // Validate required parameter
+    if (!productId) {
+      const errorResponse = BaseResponseDto.error("Product ID is required");
+      return res.status(400).json(errorResponse);
+    }
+
+    // Validate productId format (MongoDB ObjectId)
+    if (!ValidationUtils.isValidObjectId(productId)) {
+      const errorResponse = BaseResponseDto.error("Invalid product ID format");
+      return res.status(400).json(errorResponse);
+    }
+
+    const result = await productService.getProductById(productId);
+
+    if (result.success) {
+      return res.status(200).json(result);
+    } else {
+      return res.status(404).json(result);
+    }
+  } catch (error) {
+    console.error("Error in getProductById:", error);
+    const errorResponse = BaseResponseDto.error("Internal server error");
+    return res.status(500).json(errorResponse);
+  }
+};
+
 module.exports = {
   getProductsByCategory,
   getAllCategories,
   getAllProducts,
+  getProductById,
 };

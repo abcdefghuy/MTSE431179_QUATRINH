@@ -123,8 +123,73 @@ const getAllProducts = async (queryParams = {}) => {
   }
 };
 
+/**
+ * Get product by ID with detailed information
+ * @param {string} productId - The product ID
+ * @returns {Object} - Base response DTO with product details
+ */
+const getProductById = async (productId) => {
+  try {
+    // Validate productId
+    if (!ValidationUtils.isValidObjectId(productId)) {
+      return BaseResponseDto.error("Invalid product ID format");
+    }
+
+    // Find product with category information
+    const product = await Product.findById(productId)
+      .where({ isActive: true })
+      .populate({
+        path: "category",
+        select: "name description isActive",
+        match: { isActive: true },
+      })
+      .lean();
+
+    if (!product) {
+      return BaseResponseDto.error("Product not found or inactive");
+    }
+
+    // Clean and optimize product details (remove redundant fields)
+    const productWithDetails = {
+      _id: product._id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      discount: product.discount || 0,
+      finalPrice:
+        product.discount > 0
+          ? Math.round(product.price * (1 - product.discount / 100) * 100) / 100
+          : product.price,
+      stock: product.stock,
+      isInStock: product.stock > 0,
+      imageUrl: product.imageUrl,
+      category: product.category,
+      rating: product.rating || 0,
+      reviewCount: product.reviewCount || 0,
+      purchaseCount: product.purchaseCount || 0,
+      viewCount: product.viewCount || 0,
+      favoriteCount: product.favoriteCount || 0,
+      brand: product.brand,
+      tags: product.tags || [],
+      sku: product.sku,
+      hasDiscount: (product.discount || 0) > 0,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    };
+
+    return BaseResponseDto.success(
+      productWithDetails,
+      "Product details retrieved successfully"
+    );
+  } catch (error) {
+    console.error("❌ Get product by ID error:", error.message);
+    return BaseResponseDto.error("Failed to get product details");
+  }
+};
+
 module.exports = {
   getProductsByCategory,
   getAllCategories,
   getAllProducts,
+  getProductById,
 };
